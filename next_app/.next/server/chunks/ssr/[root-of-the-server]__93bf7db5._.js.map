@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
+    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":["file:///home/noobhacker/Documents/Movies/piratebaye/next_app/app/page.tsx"],"sourcesContent":["import TheaterShell from \"@/next_app/components/theater-shell\"\n\nexport default function Page() {\n  return (\n    <main className=\"min-h-screen\">\n      <TheaterShell />\n    </main>\n  )\n}\n"],"names":[],"mappings":";;;;;;;;;;;AAEe,SAAS;IACtB,qBACE,6WAAC;QAAK,WAAU;kBACd,cAAA,6WAAC;;;;;;;;;;AAGP","debugId":null}}]
+}

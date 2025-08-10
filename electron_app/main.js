@@ -7,6 +7,8 @@ import https from 'https';
 import http from 'http';
 import WebTorrent from 'webtorrent';
 import fetch from 'node-fetch';
+import { addMovie, getMovies } from './db.js';
+app.disableHardwareAcceleration(); // disables
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,7 +21,6 @@ const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_SEARCH_URL = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=`;
 const TMDB_CONFIG_URL = `https://api.themoviedb.org/3/configuration?api_key=${TMDB_API_KEY}`;
 
-console.log(`TMDB API Key: ${TMDB_API_KEY}`);
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -30,76 +31,10 @@ function createWindow() {
     }
   });
 
+   scanMoviesFolder();
+
   win.loadURL('http://localhost:3000');
 }
-
-// Get current directory
-ipcMain.handle('get-current-dir', () => {
-  return process.cwd();
-});
-
-// Create folder
-ipcMain.handle('create-folder', (event, folderPath) => {
-  if (!fs.existsSync(folderPath)) {
-    fs.mkdirSync(folderPath, { recursive: true });
-    return `Folder created: ${folderPath}`;
-  }
-  return `Folder already exists: ${folderPath}`;
-});
-
-// Download file
-ipcMain.handle('download-file', (event, { url, dest }) => {
-  return new Promise((resolve, reject) => {
-    const proto = url.startsWith('https') ? https : http;
-    const file = fs.createWriteStream(dest);
-    proto.get(url, (response) => {
-      if (response.statusCode !== 200) {
-        return reject(`Download failed: ${response.statusCode}`);
-      }
-      response.pipe(file);
-      file.on('finish', () => {
-        file.close(() => resolve(`Downloaded to: ${dest}`));
-      });
-    }).on('error', (err) => {
-      fs.unlink(dest, () => reject(err.message));
-    });
-  });
-});
-
-// Delete file
-ipcMain.handle('delete-file', (event, filePath) => {
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-    return `Deleted: ${filePath}`;
-  }
-  return `File not found: ${filePath}`;
-});
-
-ipcMain.handle('download-torrent', async (event, torrentId) => {
-  return new Promise((resolve, reject) => {
-    client.add(torrentId, { path: path.join(app.getPath('downloads'), 'torrents') }, (torrent) => {
-      console.log(`Downloading: ${torrent.name}`)
-
-      torrent.on('download', () => {
-        mainWindow.webContents.send('torrent-progress', {
-          progress: (torrent.progress * 100).toFixed(2),
-          downloaded: torrent.downloaded,
-          total: torrent.length
-        })
-      })
-
-      torrent.on('done', () => {
-        console.log('Download finished:', torrent.name)
-        resolve({ status: 'done', name: torrent.name, path: torrent.path })
-      })
-
-      torrent.on('error', (err) => {
-        console.error(err)
-        reject(err)
-      })
-    })
-  })
-})
 
 
 async function getImageConfig() {
@@ -158,13 +93,43 @@ async function scanMoviesFolder() {
       results.push(info);
     }
   }
-
-  console.log(JSON.stringify(results, null, 2));
+  for (const movie of results) {
+    if (!movie.error) {
+      await addMovie(movie);
+    }
+  }
+  // console.log("Scan results:", results);
+  // console.log(JSON.stringify(results, null, 2));
 }
 
-scanMoviesFolder();
+
+
+
+
+
+
+
+
+ipcMain.handle('start-torrent-download', async (event, magnetURI, fileName) => {
+  try {
+    const filePath = await downloadTorrent(magnetURI, fileName, event)
+    return { success: true, filePath }
+  } catch (err) {
+    return { success: false, error: err.message }
+  }
+})
+ipcMain.handle('get-movie', async (event) => {
+    try {
+        const movie = await getMovies()
+        return { success: true, movie }
+    } catch (err) {
+        return { success: false, error: err.message }
+    }
+})
 
 app.whenReady().then(createWindow);
+
+
 
 
 // [

@@ -1,8 +1,8 @@
 "use client"
 
 import { useMemo } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/next_app/components/ui/dialog"
-import { Button } from "@/next_app/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 import { Download, CheckCircle2, Loader2, X } from "lucide-react"
 
 export type DownloadEntry = {

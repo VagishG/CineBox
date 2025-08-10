@@ -1,4 +1,4 @@
-import TheaterShell from "@/next_app/components/theater-shell"
+import TheaterShell from "@/components/theater-shell"
 
 export default function Page() {
   return (

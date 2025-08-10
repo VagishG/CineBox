@@ -15,9 +15,9 @@ import {
   Download,
   Axis3DIcon,
 } from "lucide-react";
-import { Button } from "@/next_app/components/ui/button";
-import { Input } from "@/next_app/components/ui/input";
-import { Label } from "@/next_app/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -25,18 +25,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/next_app/components/ui/dialog";
+} from "@/components/ui/dialog";
 import {
   DownloadsPanel,
   type DownloadEntry,
-} from "@/next_app/components/downloads-panel";
-import { MOVIES } from "@/next_app/data/movies";
-import { SERIES } from "@/next_app/data/series";
-import { LOCAL_ITEMS, type LocalItem } from "@/next_app/data/local";
+} from "@/components/downloads-panel";
+import { MOVIES } from "@/data/movies";
+import { SERIES } from "@/data/series";
+import { LOCAL_ITEMS, type LocalItem } from "@/data/local";
 import axios from "axios";
 
 import LeftNav from "./left-nav";
-import { downloadTorrent } from "@/next_app/lib/handleMovieDownload";
+import { downloadTorrent } from "@/lib/handleMovieDownload";
 import { SearchOverlay, StartOverlay } from "./Overlays";
 import MainSection from "./MainSection";
 type MenuKey = "movies" | "series" | "local";
